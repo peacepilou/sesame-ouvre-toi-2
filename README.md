@@ -189,7 +189,7 @@ Ici aussi, la caisse décide : un `id` inconnu ou épuisé n'est jamais mis en a
 <details>
 <summary>Un indice</summary>
 
-Garde les `id` conseillés dans un tableau, et c'est `renderMenu` qui ajoute la classe au moment de créer chaque carte. C'est le même principe qu'à l'étape 4 du premier exercice : on efface tout, on redessine tout.
+Garde les `id` conseillés dans un tableau, et c'est `createProductCard` (dans `register/menu-section.js`) qui ajoute la classe au moment de créer chaque carte. C'est le même principe qu'à l'étape 4 du premier exercice : on efface tout, on redessine tout.
 </details>
 
 ---
