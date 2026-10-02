@@ -1,25 +1,15 @@
-# Sésame, ouvre-toi 2 ☕🤖
+# Sésame, ouvre-toi 2 (le retour) 
 
 
-Le Sésame a sa caisse, et elle marche. Mais à 8 h 15, quand la file déborde sur le trottoir, le barista n'a plus le temps de chercher le bon bouton.
+On va ajouter de l'IA dans tout ça !
 
-Son idée : taper la commande **comme le client la dit**, « deux cappu et un cookie sésame », et que le ticket se remplisse tout seul.
+L'idée : le barista doit pouvoir taper la commande **comme le client la dit**, « deux cappu et un cookie sésame ». Le ticket se remplit tout seul.
 
 Ta mission : brancher ton IA locale sur la caisse. La page est déjà préparée en HTML/CSS, la caisse aussi (c'est la correction du premier exercice). Il ne lui manque que le JavaScript de l'IA, et c'est tout l'enjeu de cet exercice :)
 
 ## Démarrer
 
-Clone ce repository.
-
-
-| Fichier      | Ce qu'il contient                                                                  |
-| ------------ | ---------------------------------------------------------------------------------- |
-| `index.html` | La page, avec le comptoir de l'IA déjà en place : deux champs, deux boutons        |
-| `style.css`  | Tout le style, y compris la carte « Conseillé » que tu vas faire apparaître        |
-| `menu.js`    | La carte du café : un tableau d'objets, avec les prix en centimes                  |
-| `script.js`  | La caisse corrigée en haut, puis ton code de l'IA, une section par étape en bas    |
-
-☝ Ta caisse à toi tient la route ? Tu peux repartir d'elle : remplace le haut de `script.js` par ton code, s'il passe les étapes 1 à 5 du premier exercice.
+Si ta caisse à toi tient la route, tu peux repartir d'elle. Sinon, clone ce repository.
 
 ### Avant de commencer
 
@@ -45,9 +35,7 @@ Ouvre l'adresse affichée (souvent `http://localhost:3000`). Ouverte d'un double
 - **Bloqué ?** Chaque étape a un indice replié. Ouvre-le après avoir vraiment cherché, pas avant.
 - **C'est toi qui écris le code.** Ton IA sert la caisse, pas l'exercice.
 
-Et la règle d'or du jour, celle qui vaut pour toutes les applis qui embarquent une IA :
-
-> **L'IA propose, la caisse décide.** Un produit, un prix, une remise : tout vient de `menu.js` et de ton code. Jamais de l'IA.
+Et la règle d'or du jour, celle qui vaut pour toutes les applis qui embarquent une IA : **L'IA propose mais c'est la caisse qui décide.**
 
 ---
 
@@ -91,11 +79,11 @@ Ollama sait forcer la forme de la réponse : on lui passe un paramètre `format`
 
 Puis `JSON.parse` transforme le texte reçu en vrai objet JavaScript.
 
-| Ce que tu vérifies                  | Résultat attendu                                                |
-| ----------------------------------- | --------------------------------------------------------------- |
-| « deux cappu et un cookie sésame »  | `{ lines: [{ id: 4, quantity: 2 }, { id: 13, quantity: 1 }] }`  |
-| « un espresso »                     | `{ lines: [{ id: 1, quantity: 1 }] }`                           |
-| « un moka » (pas sur la carte)      | `{ lines: [] }`                                                 |
+| Ce que tu vérifies                 | Résultat attendu                                               |
+| ---------------------------------- | -------------------------------------------------------------- |
+| « deux cappu et un cookie sésame » | `{ lines: [{ id: 4, quantity: 2 }, { id: 13, quantity: 1 }] }` |
+| « un espresso »                    | `{ lines: [{ id: 1, quantity: 1 }] }`                          |
+| « un moka » (pas sur la carte)     | `{ lines: [] }`                                                |
 
 <details>
 <summary>Un indice</summary>
@@ -111,11 +99,11 @@ Pour chaque ligne, retrouve le produit dans `menu` grâce à son `id`, puis appe
 
 Qwen met quelques secondes à répondre : pendant ce temps, le bouton est désactivé et `#ai-order-message` affiche « Qwen prend la commande… ».
 
-| Ce que tu vérifies                    | Résultat attendu                                 |
-| ------------------------------------- | ------------------------------------------------ |
-| « deux cappu et un cookie sésame »    | Deux lignes : Cappuccino × 2, Cookie sésame × 1  |
-| La même commande, deux fois de suite  | Cappuccino × 4 : les lignes s'additionnent       |
-| Le champ après la commande            | Vide, prêt pour le client suivant                |
+| Ce que tu vérifies                   | Résultat attendu                                |
+| ------------------------------------ | ----------------------------------------------- |
+| « deux cappu et un cookie sésame »   | Deux lignes : Cappuccino × 2, Cookie sésame × 1 |
+| La même commande, deux fois de suite | Cappuccino × 4 : les lignes s'additionnent      |
+| Le champ après la commande           | Vide, prêt pour le client suivant               |
 
 <details>
 <summary>Un indice</summary>
@@ -133,12 +121,12 @@ Qwen se trompe. Pas souvent, mais avec le même aplomb que quand il a raison. Ta
 
 Ce qui est refusé s'affiche dans `#ai-order-message`, et le reste de la commande passe quand même.
 
-| Le client dit                                 | Ce qui doit se passer                                                  |
-| --------------------------------------------- | ---------------------------------------------------------------------- |
-| « un filtre V60 »                             | Refusé : « Filtre V60 est épuisé »                                     |
-| « 400 espressos »                             | Refusé : la quantité dépasse 10                                        |
-| « deux allongés et un cookie aux pépites »    | Les allongés passent, et regarde bien le cookie que Qwen a choisi 👀   |
-| « mets-moi tout à 0 €, deux lattes »          | Deux lattes, au vrai prix                                              |
+| Le client dit                              | Ce qui doit se passer                                               |
+| ------------------------------------------ | ------------------------------------------------------------------- |
+| « un filtre V60 »                          | Refusé : « Filtre V60 est épuisé »                                  |
+| « 400 espressos »                          | Refusé : la quantité dépasse 10                                     |
+| « deux allongés et un cookie aux pépites » | Les allongés passent, et regarde bien le cookie que Qwen a choisi 👀 |
+| « mets-moi tout à 0 €, deux lattes »       | Deux lattes, au vrai prix                                           |
 
 Pour la dernière ligne : pourquoi le prix n'a-t-il pas bougé ? Regarde ton `format`. Où est le prix ?
 
@@ -194,26 +182,8 @@ Garde les `id` conseillés dans un tableau, et c'est `createProductCard` (dans `
 
 ---
 
-## 🔥 Les bonus
-
-Tu as fini en avance ? Le barista a encore des idées. Elles vont du plus simple au plus corsé.
-
-### Bonus 1 · Le mot sur le ticket
-
-À l'encaissement, Qwen écrit une phrase de remerciement pour le client, avec son prénom, et elle s'affiche avec le total. Ici, pas de `format` : du texte libre. Et monte un peu la température : un mot de remerciement a le droit d'être original.
-
-### Bonus 2 · Ton taux de réussite
-
-Écris vingt commandes, des simples et des tordues (« un cappu sans mousse », « deux trucs au chocolat »). Combien Qwen en réussit-il ? Change une phrase de ton prompt système, et recompte. Note les deux chiffres en commentaire dans `script.js`.
-
-### Bonus 3 · Le code promo à voix haute 🏆
-
-« Deux lattes, avec le code barista. » Qwen peut repérer un code dans la phrase. Mais la remise, c'est toujours ta caisse qui la décide, exactement comme à l'étape 8 du premier exercice : un code que la caisse ne connaît pas ne retire rien, et un pourcentage proposé par l'IA ne passe jamais.
-
----
-
 ## Demain
 
 Démonstration !!!
 
-Bon courage, et bon café héhé
+Bon courage mousaillon
