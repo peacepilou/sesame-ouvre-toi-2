@@ -43,8 +43,6 @@ Et la règle d'or du jour, celle qui vaut pour toutes les applis qui embarquent 
 
 ### Étape 1 · Parler à Qwen
 
-Avant de prendre une commande, il faut savoir parler à ton modèle depuis la page.
-
 Écris une fonction `askModel(messages)` qui envoie la conversation à Ollama, à l'adresse `http://localhost:11434/api/chat`, avec le modèle `qwen3.5:4b`, et qui renvoie le texte de sa réponse.
 
 **Ce que tu dois voir :** dans la console du navigateur, `await askModel([{ role: "user", content: "Dis bonjour au barista" }])` affiche une phrase de Qwen.
@@ -52,14 +50,14 @@ Avant de prendre une commande, il faut savoir parler à ton modèle depuis la pa
 <details>
 <summary>Un indice</summary>
 
-Tu as déjà lu cette fonction : c'est `askAssistant`, dans le `script.js` de `ai-local-assistant`. Repars d'elle, et change ce qui doit l'être. N'oublie pas `think: false` et `stream: false`, sinon la réponse arrive en morceaux, précédée de toute sa réflexion.
+Tu as déjà lu cette fonction : c'est `askAssistant`, dans le `script.js` de `ai-local-assistant`.
 </details>
 
 ### Étape 2 · La carte dans le prompt système
 
-Qwen ne connaît pas le Sésame. S'il ne voit pas la carte, il inventera des produits, avec beaucoup d'aplomb.
+Qwen ne connaît pas le Sésame. S'il ne voit pas la carte, il inventera des produits.
 
-Cette fois, pas de `Modelfile` : le prompt système part dans la requête, comme premier message, avec le rôle `system`. Écris-le dans une constante `orderPrompt` : son rôle (il prend les commandes du Sésame), la carte, et ce qu'il doit renvoyer pour chaque produit commandé (son `id` et sa quantité).
+Le prompt système doit partir dans la requête, comme premier message, avec le rôle `system`. Écris-le dans une constante `orderPrompt` : son rôle (il prend les commandes du Sésame), la carte, et ce qu'il doit renvoyer pour chaque produit commandé (son `id` et sa quantité).
 
 La carte, tu ne la recopies pas à la main : tu la fabriques à partir de `menu`, avec seulement l'`id` et le `name` de chaque produit, transformée en texte par `JSON.stringify`.
 
@@ -73,9 +71,9 @@ La carte, tu ne la recopies pas à la main : tu la fabriques à partir de `menu`
 
 ### Étape 3 · Une réponse en JSON
 
-Qwen répond en français, avec des phrases. Ta caisse, elle, ne sait pas lire une phrase. Il lui faut des données.
+Qwen répond en français, avec des phrases. Ta caisse, elle, ne sait pas lire une phrase. Il faut donc les faire discuter / correspondre.
 
-Ollama sait forcer la forme de la réponse : on lui passe un paramètre `format`, qui décrit l'objet attendu. Demande-lui un objet avec une propriété `lines` : un tableau d'objets `{ id, quantity }`, deux nombres entiers. La doc est ici : [les sorties structurées d'Ollama](https://docs.ollama.com/capabilities/structured-outputs).
+La bonne nouvelle, c'est que Ollama sait forcer la forme de la réponse : on lui passe un paramètre `format`, qui décrit l'objet attendu. Demande-lui un objet avec une propriété `lines` : un tableau d'objets `{ id, quantity }`, deux nombres entiers.
 
 Puis `JSON.parse` transforme le texte reçu en vrai objet JavaScript.
 
@@ -88,7 +86,7 @@ Puis `JSON.parse` transforme le texte reçu en vrai objet JavaScript.
 <details>
 <summary>Un indice</summary>
 
-`format` est un objet qui décrit un objet : `type: "object"`, puis ses `properties`. Pour un tableau, `type: "array"`, et ce qu'il contient se décrit dans `items`. Mets `temperature: 0` dans les `options` : une caisse doit répondre pareil à chaque fois.
+`format` est un objet qui décrit un objet : `type: "object"`, puis ses `properties`. Pour un tableau, `type: "array"`, et ce qu'il contient se décrit dans `items`. 
 </details>
 
 ### Étape 4 · Le ticket se remplit
@@ -136,7 +134,6 @@ Pour la dernière ligne : pourquoi le prix n'a-t-il pas bougé ? Regarde ton `fo
 `Number.isInteger(quantity)` te dit si c'est un nombre entier : [isInteger sur MDN](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger). Range les refus dans un tableau de messages, et affiche-les tous à la fin.
 </details>
 
-**Si tu es ici, le barista prend ses commandes à la voix !! 😇**
 
 ---
 
@@ -144,7 +141,6 @@ Pour la dernière ligne : pourquoi le prix n'a-t-il pas bougé ? Regarde ton `fo
 
 ### Étape 6 · Quand l'IA ne répond pas
 
-Ferme Ollama, puis passe une commande. Que voit le barista ? Rien, et le bouton reste bloqué. En plein rush, c'est la panique.
 
 Si Ollama ne répond pas, `#ai-order-message` passe en erreur (classe `is-error`) : « L'IA ne répond pas : prends la commande à la main. » Le bouton se réactive, et la caisse continue de marcher normalement.
 
@@ -158,11 +154,11 @@ Un `fetch` qui n'arrive pas à joindre le serveur lance une erreur. `try { ... }
 
 ### Étape 7 · Le prénom aussi
 
-Au Sésame, on appelle les clients par leur prénom. Ajoute une propriété `customer` à ton `format` : le prénom, s'il est dans la phrase, ou une chaîne vide.
+Ajoute une propriété `customer` à ton `format` : le prénom, s'il est dans la phrase, ou une chaîne vide.
 
 **Ce que tu dois voir :** « un latte pour Léa » met un latte sur le ticket, et le titre devient « Ticket de Léa ». « un chaï » ne change pas le prénom déjà saisi.
 
-⚠️ Ce prénom, l'IA l'a recopié de ce qu'a tapé un inconnu. Il passe par `order.customer` et `textContent`, jamais par `innerHTML` : vérifie-le dans ton code, comme à l'étape 7 du premier exercice.
+⚠️ Ce prénom, l'IA l'a recopié de ce qu'a tapé un inconnu. Il passe par `order.customer` et `textContent`, jamais par `innerHTML`.
 
 ### Étape 8 · Le conseil du barista
 
