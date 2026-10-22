@@ -1,0 +1,97 @@
+// ADVICE
+async function handleAdviceSubmit(event) {
+  event.preventDefault();
+  const inputAdviceAi = document.querySelector("#ai-advice-input");
+  const buttonAi = document.querySelector("#ai-advice-form button");
+  const messageAi = document.querySelector("#ai-advice-message");
+
+  const adviceAI = inputAdviceAi.value.trim();
+
+  if (
+    !validateAiInput(
+      adviceAI,
+      "#ai-advice-form button",
+      "#ai-advice-message",
+      messageAi,
+    )
+  )
+    return;
+
+  inputAdviceAi.value = "";
+
+  const messages = createMessages(
+    `Commande du client : <demande>${adviceAI}</demande>`,
+    `${advicePrompt}
+
+   Prénom actuel : ${JSON.stringify(order.customer)}
+
+   - Si aucun nouveau prénom n'est indiqué, conserve le prénom actuel.
+   - Si aucun prénom n'est connu, retourne "customer": "".
+   - Si "Doctor" ou "Who" aparaissent passer "exterminate" a "true". 
+   `,
+  );
+  htmlResponseAi(
+    "#ai-advice-form button",
+    "#ai-advice-message",
+    "Dalek en reflexion ...fuyez !",
+    true,
+  );
+  messageAi.classList.remove("is-error");
+
+  try {
+    // décommenter pour rendre l'IA indisponible "
+    // throw new Error("Simulation : Dalek ne répond pas");
+    const result = await askModel(messages, adviceFormat);
+
+    handleExterminate(
+      result.exterminate,
+      "#ai-advice-form button",
+      "#ai-advice-message",
+    );
+    if (!controlAdviceResult(result)) {
+      if (result.ids.length > 0) {
+        const advisedProducts = result.ids.map((id) =>
+          menu.find((product) => product.id === id && product.available),
+        );
+
+        // Vérifier que tous les produits existent et sont disponibles
+        if (advisedProducts.some((product) => !product)) {
+          htmlResponseAi(
+            "#ai-advice-form button",
+            "#ai-advice-message",
+            "Produit conseillé inexistant ou indisponible",
+            "is-error",
+          );
+          return;
+        }
+        // Afficher le conseil de Dalek
+        messageAi.textContent = result.message;
+        // console.log("conseil", result);
+
+        // afficher  les cards recomamdné avec createProductCard(product)
+
+        advisedProducts.forEach((product) => {
+          adviceProduct.push(product);
+        });
+        // console.log("adviceProduct", adviceProduct);
+        menuSection.textContent = "";
+        advisedProducts.forEach((product) => {
+          menuSection.append(createProductCard(product, "is-suggested"));
+        });
+      } else {
+        messageAi.textContent = result.message;
+      }
+    }
+  } catch (error) {
+    htmlResponseAi(
+      "#ai-advice-form button",
+      "#ai-advice-message",
+      "L'IA ne répond pas : réfléchis par toi même, feignasse !",
+      "is-error",
+    );
+
+    console.error(error);
+  } finally {
+    buttonAi.disabled = false;
+  }
+}
